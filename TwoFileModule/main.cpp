@@ -1,5 +1,3 @@
-//import <imp_header.h>;
-//import <imp_h>;
 import mod;
 import std.core;
 

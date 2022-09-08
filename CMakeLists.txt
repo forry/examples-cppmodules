@@ -68,6 +68,25 @@ target_sources(Conflicts
 set_property(TARGET PartitionModule PROPERTY CXX_STANDARD 20)
 
 #
+# SubModules
+#
+
+add_executable(SubModules)
+target_sources(SubModules
+    PRIVATE 
+        SubModules/main.cpp
+
+        SubModules/mod/mod.ixx # PMI for module mod
+        SubModules/mod/sub1/mod.sub1.ixx # PMI for submodule mod.sub1
+        SubModules/mod/sub1/mod.sub1.class.ixx SubModules/mod/sub1/mod.sub1.class.cpp # Partitions od mod.sub1 module/submodule
+        SubModules/mod/sub1/mod.sub1.func.ixx SubModules/mod/sub1/mod.sub1.func.cpp   #
+        SubModules/mod/sub2/mod.sub2.ixx # PMI for submodule mod.sub2
+)
+
+set_property(TARGET SubModules PROPERTY CXX_STANDARD 20)
+#set_property(TARGET SubModules PROPERTY FOLDER "Submodule")
+
+#
 # Module as dll
 #
 
