@@ -1,5 +1,3 @@
-module;
-
 module mod:func;
 
 int imp::mod_f(int i)

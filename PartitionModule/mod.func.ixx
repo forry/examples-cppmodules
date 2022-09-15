@@ -1,6 +1,6 @@
 export module mod:func;
 
-import :SomeClassPart;
+import :SomeClassPart; //importing fellow partition
 
 namespace imp
 {

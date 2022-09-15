@@ -54,7 +54,7 @@ target_sources(PartitionModule
 set_property(TARGET PartitionModule PROPERTY CXX_STANDARD 20)
 
 #
-# Two modules including same headers
+# Conflicts - Two modules including same headers (iostream)
 #
 
 add_executable(Conflicts)
@@ -65,7 +65,7 @@ target_sources(Conflicts
         Conflicts/mod2.ixx
 )
 
-set_property(TARGET PartitionModule PROPERTY CXX_STANDARD 20)
+set_property(TARGET Conflicts PROPERTY CXX_STANDARD 20)
 
 #
 # SubModules
