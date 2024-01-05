@@ -22,15 +22,15 @@ jobs:
         # TODO: platform: [Win32, x64]
         platform: [x64]
         cxx_standard: [20, 23]
-        shared: ["", -DBUILD_SHARED_LIBS=ON]
-        build_type: [Debug]
+        # NO! shared: ["", -DBUILD_SHARED_LIBS=ON]
+        build_type: [Release]
 
     steps:
       - uses: actions/checkout@v3
 
       - name: Create Build Environment
         run: |
-          pip install ninja
+          pip install cmake ninja
           ninja --version
           cmake --version
           cmake -E make_directory ${{runner.workspace}}/build
@@ -57,3 +57,8 @@ jobs:
         run: ctest -C ${{matrix.build_type}} --timeout 60
         env:
           CTEST_OUTPUT_ON_FAILURE: True
+
+      - name: Install
+        working-directory: ${{runner.workspace}}/build
+        run: |
+          cmake --install . --config ${{matrix.build_type}}

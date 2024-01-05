@@ -8,13 +8,18 @@ set(CMAKE_CONFIGURATION_TYPES "Release;Debug" CACHE STRING "" FORCE)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER "_cmake")
 
-include(GnuInstallDirs)
+include(GNUInstallDirs)
 
 if(WIN32)
     add_compile_options(/experimental:module) # needed for STL modules
 endif()
 
-enable_testing()
+if(PROJECT_IS_TOP_LEVEL)
+    option(TEST_INSTALLED_VERSION "Test exported cmake config set" NO)
+    enable_testing()
+endif()
+
+if(NOT TEST_INSTALLED_VERSION)
 
 #
 # Single file module
@@ -168,18 +173,24 @@ target_compile_definitions(ExternalDllModule
         INTERFACE
             "DLLMODULE_EXPORT=__declspec(dllimport)"
     )
-install(TARGETS ExternalDllModule EXPORT ExternalDllModule_export
-    FILE_SET cxx_modules_dll DESTINATION lib/cxx/miu
-)
-install(FILES ${ixx_files} TYPE INCLUDE) # there is no standard destination now so we pick include
-install(EXPORT ExternalDllModule_export NAMESPACE ExternalDllModule::
-    DESTINATION lib/cmake/ExternalDllModule FILE ExternalDllModuleConfig.cmake
-)
 set_property(TARGET ExternalDllModule PROPERTY FOLDER "Dll")
 
 #
+# install the ExternalDllModule
+#
+
+install(TARGETS ExternalDllModule EXPORT ExternalDllModule_export
+    FILE_SET cxx_modules_dll DESTINATION lib/cxx/miu
+)
+#XXX install(FILES ${ixx_files} TYPE INCLUDE) # there is no standard destination now so we pick include
+install(EXPORT ExternalDllModule_export NAMESPACE ExternalDllModule::
+    DESTINATION lib/cmake/ExternalDllModule FILE ExternalDllModuleConfig.cmake
+)
+
+endif() # NOT TEST_INSTALLED_VERSION
+
+#
 # 3rd party dll module consumption
-# You need to install the ExternalDllModule first
 #
 
 if(NOT TARGET ExternalDllModule)
