@@ -1,5 +1,16 @@
 cmake_minimum_required(VERSION 3.28)
 
+#---------------------------------------------------------------------------------------
+# Compiler config
+#---------------------------------------------------------------------------------------
+if(NOT DEFINED CMAKE_CXX_STANDARD)
+    set(CMAKE_CXX_STANDARD 20)
+    set(CMAKE_CXX_STANDARD_REQUIRED ON)
+    set(CMAKE_CXX_EXTENSIONS OFF)
+endif()
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 project(Modules
     VERSION 0.0.1
     LANGUAGES CXX)
@@ -9,6 +20,12 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER "_cmake")
 
 include(GNUInstallDirs)
+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
+    message(FATAL_ERROR "CMAKE_CXX_SCAN_FOR_MODULES not supported yet")
+else()
+    set(CMAKE_CXX_SCAN_FOR_MODULES 1)
+endif()
 
 if(WIN32)
     add_compile_options(/experimental:module) # needed for STL modules
