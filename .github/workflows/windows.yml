@@ -1,0 +1,64 @@
+---
+name: windows
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - develop
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ${{matrix.os}}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest]
+        # TODO: platform: [Win32, x64]
+        platform: [x64]
+        cxx_standard: [20, 23]
+        # NO! shared: ["", -DBUILD_SHARED_LIBS=ON]
+        build_type: [Release]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Create Build Environment
+        run: |
+          pip install cmake ninja
+          ninja --version
+          cmake --version
+          cmake -E make_directory ${{runner.workspace}}/build
+
+      - name: Configure
+        # Use a bash shell for $GITHUB_WORKSPACE.
+        shell: bash
+        working-directory: ${{runner.workspace}}/build
+        run: |
+          cmake -G Ninja -DCMAKE_SYSTEM_PROCESSOR=${{matrix.platform}} \
+                -DCMAKE_TOOLCHAIN_FILE=cmake/Windows.MSVC.toolchain.cmake \
+                -DCMAKE_CXX_STANDARD=${{matrix.cxx_standard}} \
+                ${{matrix.shared}} -DCMAKE_BUILD_TYPE=${{matrix.build_type}} \
+                $GITHUB_WORKSPACE
+
+      - name: Build
+        working-directory: ${{runner.workspace}}/build
+        run: |
+          $threads = (Get-CimInstance Win32_ComputerSystem).NumberOfLogicalProcessors
+          cmake --build . --config ${{matrix.build_type}} --parallel $threads
+
+      - name: Test
+        working-directory: ${{runner.workspace}}/build
+        run: ctest -C ${{matrix.build_type}} --timeout 60
+        env:
+          CTEST_OUTPUT_ON_FAILURE: True
+
+      - name: Install
+        working-directory: ${{runner.workspace}}/build
+        run: |
+          cmake --install . --config ${{matrix.build_type}}
